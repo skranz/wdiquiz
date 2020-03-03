@@ -1,0 +1,31 @@
+
+series:
+  table:
+    series_code: VARCHAR(30)
+    topic: VARCHAR(50)
+    indicator_name: VARCHAR(255)
+    short_definition: TEXT
+    long_definition: TEXT
+    unit: TEXT
+    periodicity: TEXT
+    base_period: TEXT
+    other_notes: TEXT
+    aggregation_method: TEXT
+    limitations_and_exceptions: TEXT
+    notes_from_original_source: TEXT
+    general_comments: TEXT
+    source: TEXT
+    statistical_concept_and_methodology: TEXT
+    development_relevance: TEXT
+  index:
+    - series_code # example index on first column
+
+data:
+  table:
+    country_code: CHARACTER(3)
+    series_code: VARCHAR(30)
+    year: integer
+    value: NUMERIC
+  index:
+    - [series_code, country_code]
+
