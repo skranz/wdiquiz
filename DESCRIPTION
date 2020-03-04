@@ -15,4 +15,5 @@ Depends:
     ggplot2,
     dbmisc,
     countrycode,
-    svglite
+    svglite,
+    scales

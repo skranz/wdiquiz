@@ -106,11 +106,17 @@ set_quiz = function(series_code, country1, country2, inds = sample.int(2), db=ge
 
   si = series_info(series_code)
 
+
   library(svglite)
   plot = ggplot(mapping = aes(x=year,y=value)) +
     geom_line(data=dat1, color="red") +
     geom_line(data=dat2, color="blue") +
     xlab("") + ylab("")
+
+  labeller = get_scale_labeller(max(dat1$value,dat2$value, na.rm=TRUE))
+  if (!is.null(labeller)) {
+    plot = plot + scale_y_continuous(labels = labeller)
+  }
 
   s <- svgstring(width = 6, height=3, pointsize=16,standalone=TRUE);
   print(plot)
@@ -149,6 +155,20 @@ set_quiz = function(series_code, country1, country2, inds = sample.int(2), db=ge
   )
   setUI("mainUI",ui)
   dsetUI("mainUI",ui)
+
+}
+
+get_scale_labeller = function(values) {
+  mv = max(values, na.rm=TRUE)
+  if (mv<=1000)
+    return(NULL)
+  if (mv <= 1e6)
+    return(comma_format())
+  if (mv <= 1e10)
+    return(unit_format(unit="M", scale=1/1e6))
+
+  return(unit_format(unit="B", scale=1/1e9))
+
 
 }
 
