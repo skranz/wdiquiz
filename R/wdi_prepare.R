@@ -11,6 +11,30 @@ prepare_country_series_summary = function() {
       last_year = max(year)
     )
 
+  dbmisc::schema.template(sum, "country_series")
+
+  schema.file = "D:/libraries/dataquiz/wdiquiz/inst/schemas/wdi.yaml"
+  db.file = "D:/libraries/dataquiz/wdi/wdi.sqlite"
+  db = dbmisc::dbConnectSQLiteWithSchema("wdi.sqlite",schema.file = schema.file)
+  dbmisc::dbCreateSchemaTables(db,schema.file = schema.file,update = TRUE)
+
+  dbInsert(db, "country_series", sum)
+
+
+  series = read.csv("WDISeries.csv",stringsAsFactors = FALSE)
+  cols = c("series_code", "topic", "indicator_name", "short_definition", "long_definition", "unit", "periodicity", "base_period", "other_notes", "aggregation_method", "limitations_and_exceptions", "notes_from_original_source", "general_comments", "source", "statistical_concept_and_methodology", "development_relevance", "related_source_links", "other_web_links", "related_indicators", "license_type", "x")
+  colnames(series) = cols
+  series = series[,1:16]
+
+  dbInsert(db, "series", series)
+
+  series.file = system.file("data/series.Rds",package="wdiquiz")
+  series = readRDS(series.file)
+  used = specify_used_series()
+  series$used = series$indicator_name %in% used
+  sum(series$used)
+  saveRDS(series, series.file)
+
 }
 
 
