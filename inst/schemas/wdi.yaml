@@ -1,3 +1,15 @@
+country_series:
+  table:
+    country_code: CHARACTER(3)
+    series_code: VARCHAR(30)
+    num_obs: INTEGER
+    num_distinct: INTEGER
+    first_year: INTEGER
+    last_year: INTEGER
+  index:
+    - [country_code, num_distinct]
+    - [series_code, num_distinct]
+
 
 series:
   table:

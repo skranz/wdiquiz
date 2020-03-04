@@ -1,35 +1,15 @@
-prepare_wdi_files = function() {
+prepare_country_series_summary = function() {
   setwd("D:/libraries/dataquiz/wdi")
   dat = readRDS("wdi_data.Rds")
 
-  key = dat %>%
-    select(series_code, country_code) %>%
-    unique()
-
-  codes = unique(dat$series_code)[1:5]
-  files.dir = "D:/libraries/dataquiz/wdi_files"
-
-}
-
-make_wdi_files = function(dat, codes, files.dir) {
-  df = dat %>%
-    filter(series_code %in% codes)
-  code = codes[1]
-  for (code in codes) {
-    dir = file.path(files.dir, code)
-    if (!dir.exists(dir)) {
-      dir.create(dir)
-    }
-    d = filter(df, series_code == code)
-    li = split(d,d$country_code)
-    for (cou in names(li)) {
-      el = li[[cou]]
-      if (NROW(el)>0) {
-        file = file.path(dir, paste0(cou,".Rds"))
-        saveRDS(el[,c("year","value")], file)
-      }
-    }
-  }
+  sum = dat %>%
+    group_by(country_code, series_code) %>%
+    summarize(
+      num_obs = n(),
+      num_distinct = n_distinct(value),
+      first_year = min(year),
+      last_year = max(year)
+    )
 
 }
 
@@ -176,21 +156,11 @@ specify_used_series = function() {
 	"CO2 emissions (kg per PPP $ of GDP)",
 	"Other greenhouse gas emissions (% change from 1990)",
 	"Total greenhouse gas emissions (% change from 1990)",
-	"Agricultural methane emissions (thousand metric tons of CO2 equivalent)",
-	"Agricultural methane emissions (% of total)",
-	"Agricultural nitrous oxide emissions (thousand metric tons of CO2 equivalent)",
-	"Agricultural nitrous oxide emissions (% of total)",
-	"Nitrous oxide emissions in energy sector (thousand metric tons of CO2 equivalent)",
 	"PM2.5 air pollution, mean annual exposure (micrograms per cubic meter)",
 	"PM2.5 pollution, population exposed to levels exceeding WHO Interim Target-1 value (% of total)",
 	"Bird species, threatened",
-	"Disaster risk reduction progress score (1-5 scale; 5=best)",
-	"GHG net emissions/removals by LUCF (Mt of CO2 equivalent)",
 	"Droughts, floods, extreme temperatures (% of population, average 1990-2009)",
 	"CO2 emissions from transport (% of total fuel combustion)",
-	"Fish species, threatened",
-	"Plant species (higher), threatened",
-	"Mammal species, threatened",
 	"Population density (people per sq. km of land area)",
 	"Population living in areas where elevation is below 5 meters (% of total population)",
 	"Population living in slums (% of urban population)",
@@ -198,9 +168,6 @@ specify_used_series = function() {
 	"Population in urban agglomerations of more than 1 million (% of total population)",
 	"Pump price for diesel fuel (US$ per liter)",
 	"Pump price for gasoline (US$ per liter)",
-	"Aquaculture production (metric tons)",
-	"Capture fisheries production (metric tons)",
-	"Total fisheries production (metric tons)",
 	"Annual freshwater withdrawals, total (% of internal resources)",
 	"Terrestrial protected areas (% of total land area)",
 	"Bank nonperforming loans to total gross loans (%)",
@@ -311,7 +278,6 @@ specify_used_series = function() {
 	"Coal rents (% of GDP)",
 	"Inflation, GDP deflator (annual %)",
 	"GDP (current US$)",
-	"GDP (current LCU)",
 	"GDP (constant 2010 US$)",
 	"GDP growth (annual %)",
 	"GDP, PPP (current international $)",
@@ -845,3 +811,40 @@ specify_used_series = function() {
 
 
 }
+
+prepare_wdi_files = function() {
+  setwd("D:/libraries/dataquiz/wdi")
+  dat = readRDS("wdi_data.Rds")
+
+  key = dat %>%
+    select(series_code, country_code) %>%
+    unique()
+
+  codes = unique(dat$series_code)[1:5]
+  files.dir = "D:/libraries/dataquiz/wdi_files"
+
+}
+
+make_wdi_files = function(dat, codes, files.dir) {
+  df = dat %>%
+    filter(series_code %in% codes)
+  code = codes[1]
+  for (code in codes) {
+    dir = file.path(files.dir, code)
+    if (!dir.exists(dir)) {
+      dir.create(dir)
+    }
+    d = filter(df, series_code == code)
+    li = split(d,d$country_code)
+    for (cou in names(li)) {
+      el = li[[cou]]
+      if (NROW(el)>0) {
+        file = file.path(dir, paste0(cou,".Rds"))
+        saveRDS(el[,c("year","value")], file)
+      }
+    }
+  }
+
+}
+
+
